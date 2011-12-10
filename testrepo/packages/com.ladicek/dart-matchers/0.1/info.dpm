@@ -1,0 +1,8 @@
+Organization: com.ladicek
+Name: dart-matchers
+Version: 0.1
+Main-Script: matchers.dart
+Author: Ladislav Thon
+License: BSD
+Description: A small library of matchers in Dart
+

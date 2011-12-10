@@ -1,0 +1,13 @@
+This is an EXPERIMENT. I intend to write some documentation, but for now,
+just read the source, Luke. Start with test.dart (and don't forget to define
+your correct path to testrepo on top of the file!).
+
+Note that this DOESN'T work on stock Dart VM as it needs some custom patches
+to the builtin library. You can get a DPM-enabled Dart VM at
+
+  https://github.com/Ladicek/dart-vm-with-dpm
+
+There are two branches: filesystem-mods, which contain the changes needed for
+DPM to work, and dart+dpm, which builds on filesystem-mods and has the DPM
+added right to the builtin library.
+
