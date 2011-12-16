@@ -23,7 +23,7 @@ class Version implements Comparable {
   String toString() => _value;
 }
 
-interface VersionSpecification factory _VersionSpecificationParser {
+interface VersionSpecification default _VersionSpecificationParser {
   VersionSpecification(String version);
 
   bool isSatisfiedBy(Version version);
