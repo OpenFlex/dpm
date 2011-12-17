@@ -5,7 +5,7 @@ your correct path to testrepo on top of the file!).
 Note that this DOESN'T work on stock Dart VM as it needs some custom patches
 to the builtin library. You can get a DPM-enabled Dart VM at
 
-  https://github.com/Ladicek/dart-vm-with-dpm
+  https://github.com/Ladicek/dartruntime
 
 There are two branches: filesystem-mods, which contain the changes needed for
 DPM to work, and dart+dpm, which builds on filesystem-mods and has the DPM
