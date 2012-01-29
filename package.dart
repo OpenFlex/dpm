@@ -89,10 +89,12 @@ class Package {
   final String author;
   final String license;
   final String description;
+  final List<String> binaries;
 
   Package._new(String this.organization, String this.name, Version this.version,
                String this.mainScript, List<PackageCoordinates> this.dependencies,
-               String this.author, String this.license, String this.description);
+               String this.author, String this.license, String this.description,
+               List<String> this.binaries);
 
   factory Package.fromDescriptor(String descriptorStr) {
     _PackageDescriptor descriptor = new _PackageDescriptor.parse(descriptorStr);
@@ -105,6 +107,7 @@ class Package {
     String author = descriptor.optional("Author");
     String license = descriptor.optional("License");
     String description = descriptor.optional("Description");
+    String binariesStr = descriptor.optional("Binaries", "");
 
     List<PackageCoordinates> dependencies = new List<PackageCoordinates>();
     List<String> dependenciesParts = dependenciesStr.split(",");
@@ -116,9 +119,21 @@ class Package {
       dependencies.add(new PackageCoordinates.parse(dependencyStr));
     }
 
+    List<String> binaries = new List<String>();
+    List<String> binariesParts = binariesStr.split(",");
+    for (String binaryStr in binariesParts) {
+      binaryStr = binaryStr.trim();
+      if (binaryStr.length == 0) {
+        continue;
+      }
+
+      binaries.add(binaryStr);
+    }
+
     Version version = new Version(versionStr);
 
-    return new Package._new(organization, name, version, mainScript, dependencies, author, license, description);
+    return new Package._new(organization, name, version, mainScript,
+        dependencies, author, license, description, binaries);
   }
 
   factory Package.fromDescriptorFile(File descriptorFile) {

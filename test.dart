@@ -57,6 +57,7 @@ Description: A small library of matchers in Dart
   expectThat(pkg.license, equals("BSD"));
   expectThat(pkg.description, equals("A small library of matchers in Dart"));
   expectThat(pkg.dependencies, emptyCollection());
+  expectThat(pkg.binaries, emptyCollection());
 
   descriptor = """
 Organization: com.ladicek
@@ -78,8 +79,27 @@ Description: A small library for working with collections in Dart
   expectThat(pkg.license, equals("BSD"));
   expectThat(pkg.description, equals("A small library for working with collections in Dart"));
   PackageCoordinates dep = new PackageCoordinates.parse("com.ladicek:dart-matchers:0.1");
-  expectThat(pkg.dependencies.length, equals(1));
-  expectThat(pkg.dependencies, collectionContains(dep));
+  expectThat(pkg.dependencies, orderedEquals([dep]));
+  expectThat(pkg.binaries, emptyCollection());
+
+  descriptor = """
+Organization: com.ladicek
+Name: test-program
+Version: 0.1
+Main-Script: program.dart
+Binaries: program, runner
+""";
+
+  pkg = new Package.fromDescriptor(descriptor);
+  expectThat(pkg.organization, equals("com.ladicek"));
+  expectThat(pkg.name, equals("test-program"));
+  expectThat(pkg.version, equals(new Version("0.1")));
+  expectThat(pkg.mainScript, equals("program.dart"));
+  expectThat(pkg.author, isNull());
+  expectThat(pkg.license, isNull());
+  expectThat(pkg.description, isNull());
+  expectThat(pkg.dependencies, emptyCollection());
+  expectThat(pkg.binaries, orderedEquals(["program", "runner"]));
 
   PackageCoordinates p = new PackageCoordinates.parse("com.ladicek:dart-matchers:0.1");
   expectThat(p.organization, equals("com.ladicek"));
@@ -119,6 +139,7 @@ testFilesystemRepository() {
   expectThat(pkg.license, equals("BSD"));
   expectThat(pkg.description, equals("A small library of matchers in Dart"));
   expectThat(pkg.dependencies, emptyCollection());
+  expectThat(pkg.binaries, emptyCollection());
 
   String url = repo.toUrl(pkg);
   expectThat(url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.1/matchers.dart"));
