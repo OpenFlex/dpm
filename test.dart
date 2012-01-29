@@ -1,3 +1,4 @@
+#import('dart:io');
 #import("dpm.dart");
 #import("../dart-matchers/matchers.dart");
 

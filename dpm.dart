@@ -3,6 +3,8 @@
 
 #library('dpm');
 
+#import('dart:io');
+
 #source('version.dart');
 #source('package.dart');
 #source('repository.dart');
