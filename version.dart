@@ -5,12 +5,15 @@ class VersionException extends DpmException {
   VersionException(String message) : super(message);
 }
 
-class Version implements Comparable {
+class Version implements Comparable, Hashable {
   static final RegExp _versionFormat = const RegExp(@'^([0-9]+\.)?[0-9]+$');
 
   final String _value;
 
   Version(String this._value) {
+    if (_value == null) {
+      throw new VersionException("Version must not be null");
+    }
     if (!_versionFormat.hasMatch(_value)) {
       throw new VersionException("Version '$_value' has bad format");
     }
@@ -20,10 +23,12 @@ class Version implements Comparable {
 
   int compareTo(Version other) => _value.compareTo(other._value);
 
+  int hashCode() => _value.hashCode();
+
   String toString() => _value;
 }
 
-interface VersionSpecification default _VersionSpecificationParser {
+interface VersionSpecification extends Hashable default _VersionSpecificationParser {
   VersionSpecification(String version);
 
   bool isSatisfiedBy(Version version);
@@ -42,6 +47,8 @@ class _FixedVersionSpecification implements VersionSpecification {
 
   bool operator==(other) => other is _FixedVersionSpecification && value == other.value;
 
+  int hashCode() => value.hashCode();
+
   String toString() => value;
 }
 
@@ -54,6 +61,8 @@ class _WildcardVersionSpecification implements VersionSpecification {
 
   bool operator==(other) => other is _WildcardVersionSpecification && value == other.value;
 
+  int hashCode() => value.hashCode();
+
   String toString() => value;
 }
 
@@ -62,6 +71,10 @@ class _VersionSpecificationParser {
   static final RegExp wildcardVersion = const RegExp(@'^([0-9]+\.)*\*$');
 
   factory VersionSpecification(String version) {
+    if (version == null) {
+      throw new VersionException("Version specification must not be null");
+    }
+
     if (fixedVersion.hasMatch(version)) {
       return new _FixedVersionSpecification(version);
     } else if (wildcardVersion.hasMatch(version)) {

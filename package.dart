@@ -5,14 +5,14 @@ class PackageException extends DpmException {
   PackageException(String message) : super(message);
 }
 
-class PackageCoordinates {
+class PackageCoordinates implements Hashable {
   static final RegExp _id = const RegExp(@'^[a-zA-Z0-9_][a-zA-Z0-9\-\.]*$');
 
   final String organization;
   final String name;
   final VersionSpecification version;
 
-  PackageCoordinates(String this.organization, String this.name, VersionSpecification this.version);
+  PackageCoordinates._new(String this.organization, String this.name, VersionSpecification this.version);
 
   factory PackageCoordinates.parse(String pkg) {
     final parts = pkg.split(':');
@@ -31,13 +31,21 @@ class PackageCoordinates {
       throw new PackageException("Package name is malformed in '$pkg'");
     }
 
-    return new PackageCoordinates(organization, name, version);
+    return new PackageCoordinates._new(organization, name, version);
   }
 
   bool operator==(other) => other is PackageCoordinates
       && organization == other.organization
       && name == other.name
       && version == other.version;
+
+  int hashCode() {
+    int result = 17;
+    result = 31 * result + (organization != null ? organization.hashCode() : 0);
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    result = 31 * result + (version != null ? version.hashCode() : 0);
+    return result;
+  }
 
   String toString() => '$organization:$name:$version';
 }
@@ -80,7 +88,7 @@ class _PackageDescriptor {
   }
 }
 
-class Package {
+class Package implements Hashable {
   final String organization;
   final String name;
   final Version version;
@@ -142,6 +150,15 @@ class Package {
     String descriptor = strInput.readSync();
     input.close();
     return new Package.fromDescriptor(descriptor);
+  }
+
+  int hashCode() {
+    int result = 17;
+    result = 31 * result + (organization != null ? organization.hashCode() : 0);
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    result = 31 * result + (version != null ? version.hashCode() : 0);
+    result = 31 * result + (mainScript != null ? mainScript.hashCode() : 0);
+    return result;
   }
 
   String toString() => 'package $organization:$name:$version';

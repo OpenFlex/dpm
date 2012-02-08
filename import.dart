@@ -32,7 +32,7 @@ class ImportSpecification {
   String toString() => script != null ? '$organization:$name:$version/$script' : '$organization:$name:$version';
 }
 
-class Import {
+class Import implements Hashable {
   final String url;
 
   Import._new(String this.url);
@@ -53,5 +53,7 @@ class Import {
     String url = repo.toUrl(package, spec.script);
     return new Import._new(url);
   }
+
+  int hashCode() => url.hashCode();
 }
 
