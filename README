@@ -3,11 +3,19 @@ just read the source, Luke. Start with test.dart (and don't forget to define
 your correct path to testrepo on top of the file!).
 
 Note that this DOESN'T work on stock Dart VM as it needs some custom patches
-to the builtin library. You can get a DPM-enabled Dart VM at
+to the dart:io library. You can get a DPM-enabled Dart VM at
 
   https://github.com/Ladicek/dartruntime
 
-There are two branches: filesystem-mods, which contain the changes needed for
-DPM to work, and dart+dpm, which builds on filesystem-mods and has the DPM
-added right to the builtin library.
+There are two branches: builtin-libs-mods, which contains the changes needed
+for DPM to work, and dart-vm+dpm, which builds on builtin-libs-mods, contains
+DPM right in the dart:io library and is able to resolve imports like this:
+
+  #import('dpm:organization:name:version');
+
+They can be shortened like this:
+
+  #import('dpm:organization:name');
+  #import('dpm:name:version');
+  #import('dpm:name');
 
