@@ -106,7 +106,7 @@ class PackageId implements Hashable {
 }
 
 class _PackageDescriptor {
-  Map<String, String> content;
+  final Map<String, String> content;
 
   _PackageDescriptor(Map<String, String> this.content);
 
@@ -114,14 +114,20 @@ class _PackageDescriptor {
     Map<String, String> content = new Map<String, String>();
     List<String> lines = descriptor.split("\n");
     for (String line in lines) {
+      int commentIdx = line.indexOf("#");
+      if (commentIdx >= 0) {
+        line = line.substring(0, commentIdx);
+      }
+
       if (line.trim().length == 0) {
         continue;
       }
 
-      int delimiterIdx = line.indexOf(":", 0);
+      int delimiterIdx = line.indexOf(":");
       if (delimiterIdx == -1) {
         throw new PackageException("Line in descriptor '$line' has bad format");
       }
+
       String key = line.substring(0, delimiterIdx).trim();
       String value = line.substring(delimiterIdx + 1).trim();
       content[key.toLowerCase()] = value;
@@ -148,14 +154,15 @@ class Package implements Hashable {
   final String mainScript;
   final List<PackageCoordinates> dependencies;
   final String author;
+  final String www;
   final String license;
   final String description;
   final List<String> binaries;
 
   Package._new(PackageId this.id, String this.mainScript,
                List<PackageCoordinates> this.dependencies,
-               String this.author, String this.license, String this.description,
-               List<String> this.binaries);
+               String this.author, String this.www, String this.license,
+               String this.description, List<String> this.binaries);
 
   factory Package.fromDescriptor(String descriptorStr) {
     _PackageDescriptor descriptor = new _PackageDescriptor.parse(descriptorStr);
@@ -167,7 +174,9 @@ class Package implements Hashable {
 
     String mainScript = descriptor.optional("Main-Script");
     String dependenciesStr = descriptor.optional("Dependencies", "");
+
     String author = descriptor.optional("Author");
+    String www = descriptor.optional("WWW");
     String license = descriptor.optional("License");
     String description = descriptor.optional("Description");
     String binariesStr = descriptor.optional("Binaries", "");
@@ -179,7 +188,7 @@ class Package implements Hashable {
         continue;
       }
 
-      dependencies.add(new PackageCoordinates.parse(dependencyStr));
+      dependencies.add(new PackageCoordinates.parse(dependencyStr.trim()));
     }
 
     List<String> binaries = new List<String>();
@@ -190,11 +199,11 @@ class Package implements Hashable {
         continue;
       }
 
-      binaries.add(binaryStr);
+      binaries.add(binaryStr.trim());
     }
 
-    return new Package._new(id, mainScript, dependencies, author, license,
-        description, binaries);
+    return new Package._new(id, mainScript, dependencies, author, www,
+        license, description, binaries);
   }
 
   factory Package.fromDescriptorFile(File descriptorFile) {
