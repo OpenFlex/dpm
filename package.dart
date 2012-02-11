@@ -1,13 +1,13 @@
 // Copyright (c) 2012, Ladislav Thon. All rights reserved. Use of this source
 // code is governed by a BSD-style license that can be found in the LICENSE file.
 
+final RegExp _id = const RegExp(@'^[a-zA-Z0-9_][a-zA-Z0-9\-\.]*$');
+
 class PackageException extends DpmException {
   PackageException(String message) : super(message);
 }
 
 class PackageCoordinates implements Hashable {
-  static final RegExp _id = const RegExp(@'^[a-zA-Z0-9_][a-zA-Z0-9\-\.]*$');
-
   final String organization;
   final String name;
   final VersionSpecification version;
@@ -16,16 +16,34 @@ class PackageCoordinates implements Hashable {
 
   factory PackageCoordinates.parse(String pkg) {
     final parts = pkg.split(':');
-    if (parts.length != 3) {
-      throw new PackageException("Package coordinates '$pkg' has bad format (it must have 3 parts)");
+
+    String name;
+    String organization;
+    VersionSpecification version;
+
+    if (parts.length == 1) {
+      name = parts[0];
+    } else if (parts.length == 2) {
+      if (_VersionSpecificationParser.matches(parts[1])) {
+        name = parts[0];
+        version = new VersionSpecification(parts[1]);
+      } else {
+        organization = parts[0];
+        name = parts[1];
+      }
+    } else if (parts.length == 3) {
+      organization = parts[0];
+      name = parts[1];
+      version = new VersionSpecification(parts[2]);
+    } else {
+      throw new PackageException("Package coordinates '$pkg' has bad format (it must have 1, 2 or 3 parts)");
     }
 
-    String organization = parts[0];
-    String name = parts[1];
-    VersionSpecification version = new VersionSpecification(parts[2]);
-
-    if (!_id.hasMatch(organization)) {
+    if (organization != null && !_id.hasMatch(organization)) {
       throw new PackageException("Package organization is malformed in '$pkg'");
+    }
+    if (name == null) {
+      throw new PackageException("Package name is missing in '$pkg'");
     }
     if (!_id.hasMatch(name)) {
       throw new PackageException("Package name is malformed in '$pkg'");
@@ -34,7 +52,44 @@ class PackageCoordinates implements Hashable {
     return new PackageCoordinates._new(organization, name, version);
   }
 
-  bool operator==(other) => other is PackageCoordinates
+  bool operator ==(other) => other is PackageCoordinates
+      && organization == other.organization
+      && name == other.name
+      && version == other.version;
+
+  int hashCode() {
+    int result = 17;
+    result = 31 * result + (organization != null ? organization.hashCode() : 0);
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    result = 31 * result + (version != null ? version.hashCode() : 0);
+    return result;
+  }
+
+  String toString() {
+    String organizationStr = organization != null ? organization : '*';
+    String versionStr = version != null ? '$version' : '*';
+    return '$organizationStr:$name:$versionStr';
+  }
+}
+
+class PackageId implements Hashable {
+  final String organization;
+  final String name;
+  final Version version;
+
+  PackageId(String this.organization, String this.name, Version this.version) {
+    if (organization == null) {
+      throw new PackageException("Organization must not be null");
+    }
+    if (name == null) {
+      throw new PackageException("Name must not be null");
+    }
+    if (version == null) {
+      throw new PackageException("Version must not be null");
+    }
+  }
+
+  bool operator ==(other) => other is PackageId
       && organization == other.organization
       && name == other.name
       && version == other.version;
@@ -89,9 +144,7 @@ class _PackageDescriptor {
 }
 
 class Package implements Hashable {
-  final String organization;
-  final String name;
-  final Version version;
+  final PackageId id;
   final String mainScript;
   final List<PackageCoordinates> dependencies;
   final String author;
@@ -99,8 +152,8 @@ class Package implements Hashable {
   final String description;
   final List<String> binaries;
 
-  Package._new(String this.organization, String this.name, Version this.version,
-               String this.mainScript, List<PackageCoordinates> this.dependencies,
+  Package._new(PackageId this.id, String this.mainScript,
+               List<PackageCoordinates> this.dependencies,
                String this.author, String this.license, String this.description,
                List<String> this.binaries);
 
@@ -110,6 +163,8 @@ class Package implements Hashable {
     String organization = descriptor.mandatory("Organization");
     String name = descriptor.mandatory("Name");;
     String versionStr = descriptor.mandatory("Version");
+    PackageId id = new PackageId(organization, name, new Version(versionStr));
+
     String mainScript = descriptor.optional("Main-Script");
     String dependenciesStr = descriptor.optional("Dependencies", "");
     String author = descriptor.optional("Author");
@@ -138,10 +193,8 @@ class Package implements Hashable {
       binaries.add(binaryStr);
     }
 
-    Version version = new Version(versionStr);
-
-    return new Package._new(organization, name, version, mainScript,
-        dependencies, author, license, description, binaries);
+    return new Package._new(id, mainScript, dependencies, author, license,
+        description, binaries);
   }
 
   factory Package.fromDescriptorFile(File descriptorFile) {
@@ -154,12 +207,14 @@ class Package implements Hashable {
 
   int hashCode() {
     int result = 17;
-    result = 31 * result + (organization != null ? organization.hashCode() : 0);
-    result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + (version != null ? version.hashCode() : 0);
+    result = 31 * result + id.hashCode();
     result = 31 * result + (mainScript != null ? mainScript.hashCode() : 0);
     return result;
   }
+
+  String get organization() => id.organization;
+  String get name() => id.name;
+  Version get version() => id.version;
 
   String toString() => 'package $organization:$name:$version';
 }

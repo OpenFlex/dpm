@@ -4,40 +4,62 @@
 
 final String testrepo = "/home/ladicek/work/dart-package-manager/testrepo";
 
+Repository buildTestRepo() {
+  Directory repoDir = new Directory(testrepo);
+  expectThat(repoDir.existsSync(), isTrue());
+
+  return new FilesystemRepository(repoDir);
+}
+
 testVersions() {
   Version v = new Version("1.0");
 
   VersionSpecification s = new VersionSpecification("1.0");
   expectThat(s.isSatisfiedBy(v), isTrue());
+  expectThat("$s", equals("1.0"));
 
   s = new VersionSpecification("0.1");
   expectThat(s.isSatisfiedBy(v), isFalse());
+  expectThat("$s", equals("0.1"));
 
   s = new VersionSpecification("1.1");
   expectThat(s.isSatisfiedBy(v), isFalse());
+  expectThat("$s", equals("1.1"));
 
   s = new VersionSpecification("2.0");
   expectThat(s.isSatisfiedBy(v), isFalse());
+  expectThat("$s", equals("2.0"));
 
   s = new VersionSpecification("1.*");
   expectThat(s.isSatisfiedBy(v), isTrue());
+  expectThat("$s", equals("1.*"));
 
   s = new VersionSpecification("*");
   expectThat(s.isSatisfiedBy(v), isTrue());
+  expectThat("$s", equals("*"));
 
   s = new VersionSpecification("0.*");
   expectThat(s.isSatisfiedBy(v), isFalse());
+  expectThat("$s", equals("0.*"));
 
   s = new VersionSpecification("2.*");
   expectThat(s.isSatisfiedBy(v), isFalse());
+  expectThat("$s", equals("2.*"));
 
+  expectThat( () => new Version(null), throwsException());
   expectThat( () => new Version("a"), throwsException());
   expectThat( () => new Version("1.*"), throwsException());
+  expectThat( () => new VersionSpecification(null), throwsException());
   expectThat( () => new VersionSpecification("a"), throwsException());
   expectThat( () => new VersionSpecification("1*"), throwsException());
 }
 
 testPackages() {
+  expectThat( () => new PackageId("org", "name", new Version("0.1")), returnsNormally());
+  expectThat( () => new PackageId("org", "name", null), throwsException());
+  expectThat( () => new PackageId("org", null, new Version("0.1")), throwsException());
+  expectThat( () => new PackageId(null, "name", new Version("0.1")), throwsException());
+
   String descriptor = """
 Organization: com.ladicek
 Name: dart-matchers
@@ -110,27 +132,84 @@ Binaries: program, runner
   expectThat(p.organization, equals("com.ladicek"));
   expectThat(p.name, equals("dart-matchers"));
   expectThat(p.version, equals(new VersionSpecification("0.*")));
-}
 
-Repository _buildTestRepo() {
-  Directory repoDir = new Directory(testrepo);
-  expectThat(repoDir.existsSync(), isTrue());
+  p = new PackageCoordinates.parse("dart-matchers:0.1");
+  expectThat(p.organization, isNull());
+  expectThat(p.name, equals("dart-matchers"));
+  expectThat(p.version, equals(new VersionSpecification("0.1")));
 
-  return new FilesystemRepository(repoDir);
+  p = new PackageCoordinates.parse("dart-matchers:0.*");
+  expectThat(p.organization, isNull());
+  expectThat(p.name, equals("dart-matchers"));
+  expectThat(p.version, equals(new VersionSpecification("0.*")));
+
+  p = new PackageCoordinates.parse("com.ladicek:dart-matchers");
+  expectThat(p.organization, equals("com.ladicek"));
+  expectThat(p.name, equals("dart-matchers"));
+  expectThat(p.version, isNull());
+
+  p = new PackageCoordinates.parse("dart-matchers");
+  expectThat(p.organization, isNull());
+  expectThat(p.name, equals("dart-matchers"));
+  expectThat(p.version, isNull());
+
+  p = new PackageCoordinates.parse("0.1");
+  expectThat(p.organization, isNull());
+  expectThat(p.name, equals("0.1"));
+  expectThat(p.version, isNull());
+
+  expectThat( () => new PackageCoordinates.parse(null), throwsException());
+  expectThat( () => new PackageCoordinates.parse(""), throwsException());
+  expectThat( () => new PackageCoordinates.parse("-"), throwsException());
+  expectThat( () => new PackageCoordinates.parse("--"), throwsException());
 }
 
 testFilesystemRepository() {
-  Repository repo = _buildTestRepo();
+  Repository repo = buildTestRepo();
 
-  List<Version> v = repo.findAvailableVersions("doesnt", "exist");
-  expectThat(v, emptyCollection());
+  List<PackageId> pkgs = repo.find(new PackageCoordinates.parse("doesnt:exist"));
+  expectThat(pkgs, emptyCollection());
 
-  v = repo.findAvailableVersions("com.ladicek", "dart-matchers");
-  expectThat(v.length, equals(2));
-  expectThat(v, collectionContains(new Version("0.1")));
-  expectThat(v, collectionContains(new Version("0.2")));
+  pkgs = repo.find(new PackageCoordinates.parse("com.ladicek:doesnt-exist"));
+  expectThat(pkgs, emptyCollection());
 
-  Package pkg = repo.readPackage("com.ladicek", "dart-matchers", new Version("0.1"));
+  pkgs = repo.find(new PackageCoordinates.parse("doesnt-exist"));
+  expectThat(pkgs, emptyCollection());
+
+  pkgs = repo.find(new PackageCoordinates.parse("com.ladicek:dart-matchers:0.3"));
+  expectThat(pkgs, emptyCollection());
+
+  pkgs = repo.find(new PackageCoordinates.parse("dart-matchers:0.3"));
+  expectThat(pkgs, emptyCollection());
+
+  pkgs = repo.find(new PackageCoordinates.parse("com.ladicek:dart-matchers"));
+  expectThat(pkgs, unorderedEquals([
+      new PackageId("com.ladicek", "dart-matchers", new Version("0.1")),
+      new PackageId("com.ladicek", "dart-matchers", new Version("0.2"))
+  ]));
+
+  pkgs = repo.find(new PackageCoordinates.parse("dart-matchers"));
+  expectThat(pkgs, unorderedEquals([
+      new PackageId("com.ladicek", "dart-matchers", new Version("0.1")),
+      new PackageId("com.ladicek", "dart-matchers", new Version("0.2")),
+      new PackageId("com.example", "dart-matchers", new Version("0.0.1"))
+  ]));
+
+  pkgs = repo.find(new PackageCoordinates.parse("dart-matchers:0.*"));
+  expectThat(pkgs, unorderedEquals([
+      new PackageId("com.ladicek", "dart-matchers", new Version("0.1")),
+      new PackageId("com.ladicek", "dart-matchers", new Version("0.2")),
+      new PackageId("com.example", "dart-matchers", new Version("0.0.1"))
+  ]));
+
+  pkgs = repo.find(new PackageCoordinates.parse("dart-matchers:0.1"));
+  expectThat(pkgs, unorderedEquals([
+      new PackageId("com.ladicek", "dart-matchers", new Version("0.1"))
+  ]));
+
+  PackageId pkgId = new PackageId("com.ladicek", "dart-matchers", new Version("0.1"));
+  Package pkg = repo.readPackage(pkgId);
+  expectThat(pkg.id, equals(pkgId));
   expectThat(pkg.organization, equals("com.ladicek"));
   expectThat(pkg.name, equals("dart-matchers"));
   expectThat(pkg.version, equals(new Version("0.1")));
@@ -143,9 +222,27 @@ testFilesystemRepository() {
 
   String url = repo.toUrl(pkg);
   expectThat(url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.1/matchers.dart"));
+
+  pkgId = new PackageId("com.example", "dart-matchers", new Version("0.0.1"));
+  pkg = repo.readPackage(pkgId);
+  expectThat(pkg.id, equals(pkgId));
+  expectThat(pkg.organization, equals("com.example"));
+  expectThat(pkg.name, equals("dart-matchers"));
+  expectThat(pkg.version, equals(new Version("0.0.1")));
+  expectThat(pkg.mainScript, isNull());
+  expectThat(pkg.author, isNull());
+  expectThat(pkg.license, isNull());
+  expectThat(pkg.description, equals("An artificial package with intentionally duplicate name"));
+  expectThat(pkg.dependencies, emptyCollection());
+  expectThat(pkg.binaries, orderedEquals(["test-matchers", "run-matcher"]));
+
+  expectThat( () => repo.toUrl(pkg), throwsException());
+
+  url = repo.toUrl(pkg, "main.dart");
+  expectThat(url, equals("$testrepo/packages/com.example/dart-matchers/0.0.1/main.dart"));
 }
 
-testImports() {
+testImportSpecification() {
   ImportSpecification i = new ImportSpecification.parse("com.ladicek:dart-matchers:0.1");
   expectThat(i.organization, equals("com.ladicek"));
   expectThat(i.name, equals("dart-matchers"));
@@ -164,9 +261,62 @@ testImports() {
   expectThat(i.version, equals(new VersionSpecification("*")));
   expectThat(i.script, equals("src/matchers.dart"));
 
-  Repository repo = _buildTestRepo();
+  i = new ImportSpecification.parse("com.ladicek:dart-matchers");
+  expectThat(i.organization, equals("com.ladicek"));
+  expectThat(i.name, equals("dart-matchers"));
+  expectThat(i.version, isNull());
+  expectThat(i.script, isNull());
+
+  i = new ImportSpecification.parse("dart-matchers");
+  expectThat(i.organization, isNull());
+  expectThat(i.name, equals("dart-matchers"));
+  expectThat(i.version, isNull());
+  expectThat(i.script, isNull());
+
+  i = new ImportSpecification.parse("dart-matchers:0.1");
+  expectThat(i.organization, isNull());
+  expectThat(i.name, equals("dart-matchers"));
+  expectThat(i.version, equals(new VersionSpecification("0.1")));
+  expectThat(i.script, isNull());
+
+  i = new ImportSpecification.parse("com.ladicek:dart-matchers/matchers.dart");
+  expectThat(i.organization, equals("com.ladicek"));
+  expectThat(i.name, equals("dart-matchers"));
+  expectThat(i.version, isNull());
+  expectThat(i.script, equals("matchers.dart"));
+
+  i = new ImportSpecification.parse("dart-matchers/src/matchers.dart");
+  expectThat(i.organization, isNull());
+  expectThat(i.name, equals("dart-matchers"));
+  expectThat(i.version, isNull());
+  expectThat(i.script, equals("src/matchers.dart"));
+
+  i = new ImportSpecification.parse("dart-matchers:0.1/matchers.dart");
+  expectThat(i.organization, isNull());
+  expectThat(i.name, equals("dart-matchers"));
+  expectThat(i.version, equals(new VersionSpecification("0.1")));
+  expectThat(i.script, equals("matchers.dart"));
+
+  i = new ImportSpecification.parse("dart-matchers:0.*/src/matchers.dart");
+  expectThat(i.organization, isNull());
+  expectThat(i.name, equals("dart-matchers"));
+  expectThat(i.version, equals(new VersionSpecification("0.*")));
+  expectThat(i.script, equals("src/matchers.dart"));
+}
+
+testImportResolving() {
+  Repository repo = buildTestRepo();
 
   ImportSpecification spec = new ImportSpecification.parse("doesnt:exist:0");
+  expectThat( () => new Import.resolve(spec, repo), throwsException());
+
+  spec = new ImportSpecification.parse("doesnt-exist:0");
+  expectThat( () => new Import.resolve(spec, repo), throwsException());
+
+  spec = new ImportSpecification.parse("doesnt-exist");
+  expectThat( () => new Import.resolve(spec, repo), throwsException());
+
+  spec = new ImportSpecification.parse("dart-matchers");
   expectThat( () => new Import.resolve(spec, repo), throwsException());
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.1");
@@ -184,13 +334,62 @@ testImports() {
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.1/src/dart-matchers.dart");
   resolved = new Import.resolve(spec, repo);
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.1/src/dart-matchers.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-matchers");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.2/matchers.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-matchers/matchers.dart");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.2/matchers.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-query:0.1");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/0.1/query.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-query:0.*");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/0.2/query.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-query:*");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/query.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-query");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/query.dart"));
+
+  spec = new ImportSpecification.parse("dart-query");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/query.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-query:0.1/dart-query.dart");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/0.1/dart-query.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-query:0.*/dart-query.dart");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/0.2/dart-query.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-query:*/dart-query.dart");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/dart-query.dart"));
+
+  spec = new ImportSpecification.parse("com.ladicek:dart-query/dart-query.dart");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/dart-query.dart"));
+
+  spec = new ImportSpecification.parse("dart-query/dart-query.dart");
+  resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/dart-query.dart"));
 }
 
 main() {
   testVersions();
   testPackages();
   testFilesystemRepository();
-  testImports();
+  testImportSpecification();
+  testImportResolving();
 
   print("ok");
 }

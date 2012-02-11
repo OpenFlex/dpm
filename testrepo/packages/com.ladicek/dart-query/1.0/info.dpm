@@ -1,0 +1,9 @@
+Organization: com.ladicek
+Name: dart-query
+Version: 1.0
+Main-Script: query.dart
+Dependencies: com.ladicek:dart-matchers:0.1
+Author: Ladislav Thon
+License: BSD
+Description: A small library for working with collections in Dart
+

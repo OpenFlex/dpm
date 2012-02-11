@@ -6,11 +6,11 @@ class VersionException extends DpmException {
 }
 
 class Version implements Comparable, Hashable {
-  static final RegExp _versionFormat = const RegExp(@'^([0-9]+\.)?[0-9]+$');
+  static final RegExp _versionFormat = const RegExp(@'^([0-9]+\.)*[0-9]+$');
 
   final String _value;
 
-  Version(String this._value) {
+  Version(String value) : _value = value {
     if (_value == null) {
       throw new VersionException("Version must not be null");
     }
@@ -33,42 +33,45 @@ interface VersionSpecification extends Hashable default _VersionSpecificationPar
 
   bool isSatisfiedBy(Version version);
 
-  bool operator==(VersionSpecification other);
+  bool operator ==(VersionSpecification other);
 
   String toString();
 }
 
 class _FixedVersionSpecification implements VersionSpecification {
-  final String value;
+  final String _value;
 
-  _FixedVersionSpecification(String this.value);
+  _FixedVersionSpecification(String value) : _value = value;
 
-  bool isSatisfiedBy(Version version) => value == version._value;
+  bool isSatisfiedBy(Version version) => _value == version._value;
 
-  bool operator==(other) => other is _FixedVersionSpecification && value == other.value;
+  bool operator ==(other) => other is _FixedVersionSpecification && _value == other._value;
 
-  int hashCode() => value.hashCode();
+  int hashCode() => _value.hashCode();
 
-  String toString() => value;
+  String toString() => _value;
 }
 
 class _WildcardVersionSpecification implements VersionSpecification {
-  final String value;
+  final String _value;
 
-  _WildcardVersionSpecification(String this.value);
+  _WildcardVersionSpecification(String value) : _value = value;
 
-  bool isSatisfiedBy(Version version) => version._value.startsWith(value);
+  bool isSatisfiedBy(Version version) => version._value.startsWith(_value);
 
-  bool operator==(other) => other is _WildcardVersionSpecification && value == other.value;
+  bool operator ==(other) => other is _WildcardVersionSpecification && _value == other._value;
 
-  int hashCode() => value.hashCode();
+  int hashCode() => _value.hashCode();
 
-  String toString() => value;
+  String toString() => _value.length > 0 ? '$_value.*' : '*';
 }
 
 class _VersionSpecificationParser {
   static final RegExp fixedVersion = Version._versionFormat;
   static final RegExp wildcardVersion = const RegExp(@'^([0-9]+\.)*\*$');
+
+  static bool matches(String str) => fixedVersion.hasMatch(str)
+      || wildcardVersion.hasMatch(str);
 
   factory VersionSpecification(String version) {
     if (version == null) {

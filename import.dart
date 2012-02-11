@@ -29,7 +29,7 @@ class ImportSpecification {
   String get name() => coordinates.name;
   VersionSpecification get version() => coordinates.version;
 
-  String toString() => script != null ? '$organization:$name:$version/$script' : '$organization:$name:$version';
+  String toString() => script != null ? '$coordinates/$script' : '$coordinates';
 }
 
 class Import implements Hashable {
@@ -38,21 +38,41 @@ class Import implements Hashable {
   Import._new(String this.url);
 
   factory Import.resolve(ImportSpecification spec, Repository repo) {
-    List<Version> availableVersions = repo.findAvailableVersions(spec.organization, spec.name);
-    List<Version> candidates = availableVersions.filter( (v) => spec.version.isSatisfiedBy(v) );
+    List<PackageId> candidates = repo.find(spec.coordinates);
 
     if (candidates.length == 0) {
       throw new ResolvingException("Couldn't resolve '$spec'");
     }
 
-    candidates.sort( (a, b) => -1 * a.compareTo(b) ); // highest first
+    if (spec.organization == null) {
+      Set<String> organizations = new Set<String>();
+      for (PackageId candidate in candidates) {
+        organizations.add(candidate.organization);
+      }
+      if (organizations.length > 1) {
+        String organizationsDesc = Strings.join(new List.from(organizations), ', ');
+        throw new ResolvingException("Package '${spec.name}' is available from more organizations [$organizationsDesc], the organization must be specified explicitly");
+      }
+    }
 
-    Version selectedVersion = candidates[0];
-    Package package = repo.readPackage(spec.organization, spec.name, selectedVersion);
+    if (spec.version != null) {
+      candidates = candidates.filter( (c) => spec.version.isSatisfiedBy(c.version) );
+    }
+
+    if (candidates.length == 0) {
+      throw new ResolvingException("Couldn't resolve '$spec'");
+    }
+
+    candidates.sort( (a, b) => -a.version.compareTo(b.version) ); // highest first
+
+    PackageId selected = candidates[0];
+    Package package = repo.readPackage(selected);
 
     String url = repo.toUrl(package, spec.script);
     return new Import._new(url);
   }
+
+  bool operator ==(other) => other is Import && url == other.url;
 
   int hashCode() => url.hashCode();
 }

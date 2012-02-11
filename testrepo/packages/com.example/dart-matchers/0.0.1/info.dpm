@@ -1,0 +1,6 @@
+Organization: com.example
+Name: dart-matchers
+Version: 0.0.1
+Description: An artificial package with intentionally duplicate name
+Binaries: test-matchers, run-matcher
+
