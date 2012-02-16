@@ -81,8 +81,14 @@ class PackageId implements Hashable {
     if (organization == null) {
       throw new PackageException("Organization must not be null");
     }
+    if (!_id.hasMatch(organization)) {
+      throw new PackageException("Organization '$organization' has bad format");
+    }
     if (name == null) {
       throw new PackageException("Name must not be null");
+    }
+    if (!_id.hasMatch(name)) {
+      throw new PackageException("Name '$name' has bad format");
     }
     if (version == null) {
       throw new PackageException("Version must not be null");

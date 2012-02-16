@@ -56,6 +56,9 @@ testVersions() {
 
 testPackages() {
   expectThat( () => new PackageId("org", "name", new Version("0.1")), returnsNormally());
+  expectThat( () => new PackageId("-org", "name", new Version("0.1")), throwsException());
+  expectThat( () => new PackageId("org", "-name", new Version("0.1")), throwsException());
+  expectThat( () => new PackageId("org", "name", new Version("-0.1")), throwsException());
   expectThat( () => new PackageId("org", "name", null), throwsException());
   expectThat( () => new PackageId("org", null, new Version("0.1")), throwsException());
   expectThat( () => new PackageId(null, "name", new Version("0.1")), throwsException());
