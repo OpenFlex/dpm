@@ -1,12 +1,18 @@
 #import('dart:io');
 #import("dpm.dart");
 #import("../dart-matchers/matchers.dart");
+#import("../dart-matchers/io/io-matchers.dart");
 
-final String testrepo = "/home/ladicek/work/dart-package-manager/testrepo";
+var testrepo = 'not yet determined';
+
+determineTestRepoPath() {
+  var scriptPath = new Options().script;
+  testrepo = scriptPath.replaceFirst("test.dart", "testrepo");
+}
 
 Repository buildTestRepo() {
   Directory repoDir = new Directory(testrepo);
-  expectThat(repoDir.existsSync(), isTrue());
+  expectThat(repoDir, directoryExists());
 
   return new FilesystemRepository(repoDir);
 }
@@ -388,6 +394,8 @@ testImportResolving() {
 }
 
 main() {
+  determineTestRepoPath();
+
   testVersions();
   testPackages();
   testFilesystemRepository();
