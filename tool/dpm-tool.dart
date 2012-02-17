@@ -7,6 +7,8 @@
 #import('../dpm.dart');
 #import('../../dartlings/files.dart');
 
+#source('infer.dart');
+
 final dpmToolVersion = "0.1-dev";
 
 class ToolException extends DpmException {

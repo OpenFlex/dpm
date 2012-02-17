@@ -1,0 +1,7 @@
+// This is valid Dart source, but it is ignored as it doesn't end with .dart.
+
+#library('ignored');
+#import('dpm:whatever');
+
+main() => print('ignored');
+

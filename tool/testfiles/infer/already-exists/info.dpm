@@ -1,0 +1,5 @@
+Organization: my-organization
+Name: my-lib
+Version: 0.1
+Main-Script: lib.dart
+

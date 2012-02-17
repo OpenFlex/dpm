@@ -61,7 +61,7 @@ main() {
     "show": nyi,
     "list": nyi,
 
-    "infer": nyi,
+    "infer": infer,
     "build": nyi,
     "deploy": nyi,
     "publish": nyi
