@@ -10,6 +10,8 @@
 #source('repository.dart');
 #source('import.dart');
 
+final dpmVersion = "0.1-dev";
+
 class DpmException implements Exception {
   final String _message;
 

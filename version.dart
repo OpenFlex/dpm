@@ -19,7 +19,7 @@ class Version implements Comparable, Hashable {
     }
   }
 
-  bool operator==(Object other) => other is Version && _value == other._value;
+  bool operator ==(Object other) => other is Version && _value == other._value;
 
   int compareTo(Version other) => _value.compareTo(other._value);
 
