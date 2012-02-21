@@ -1,7 +1,7 @@
 // Copyright (c) 2012, Ladislav Thon. All rights reserved. Use of this source
 // code is governed by a BSD-style license that can be found in the LICENSE file.
 
-final RegExp _id = const RegExp(@'^[a-zA-Z0-9_][a-zA-Z0-9\-\.]*$');
+final RegExp _id = const RegExp(@'^[a-zA-Z0-9_][a-zA-Z0-9_\-\.]*$');
 
 class PackageException extends DpmException {
   PackageException(String message) : super(message);

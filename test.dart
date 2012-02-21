@@ -69,6 +69,9 @@ testPackages() {
   expectThat( () => new PackageId("org", null, new Version("0.1")), throwsException());
   expectThat( () => new PackageId(null, "name", new Version("0.1")), throwsException());
 
+  expectThat( () => new PackageId("_org", "0name", new Version("0.1")), returnsNormally());
+  expectThat( () => new PackageId("_o1r-g.", "0n_a-m.e1", new Version("0.1")), returnsNormally());
+
   String descriptor = """
 Organization: com.ladicek
 Name: dart-matchers
