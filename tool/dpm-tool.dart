@@ -7,6 +7,7 @@
 #import('../dpm.dart');
 
 #source('infer.dart');
+#source('build.dart');
 
 final dpmToolVersion = "0.1-dev";
 
