@@ -22,7 +22,7 @@ class DpmException implements Exception {
 
 String resolveLocally(String importSpecStr) {
   ImportSpecification spec = new ImportSpecification.parse(importSpecStr);
-  Repository repo = new _LocalUserRepository();
+  Repository repo = new LocalUserRepository();
 
   Import import = new Import.resolve(spec, repo);
   return import.url;

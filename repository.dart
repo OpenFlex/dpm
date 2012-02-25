@@ -13,8 +13,9 @@ interface Repository {
 
 class FilesystemRepository implements Repository {
   final Directory root;
+  final Directory packagesDir;
 
-  FilesystemRepository(Directory dpmRoot) : root = dpmRoot.subdirectory(['packages']);
+  FilesystemRepository(Directory root) : root = root, packagesDir = root.subdirectory(['packages']);
 
   List<PackageId> find(PackageCoordinates coordinates) {
     if (coordinates.organization != null && coordinates.version != null) {
@@ -33,7 +34,7 @@ class FilesystemRepository implements Repository {
   List<PackageId> findByName(String name) {
     List<PackageId> result = <PackageId>[];
 
-    Directory packagesDir = new Directory(root.path);
+    Directory packagesDir = new Directory(packagesDir.path);
     packagesDir.dirHandler = (dir) => result.addAll(findByOrganizationAndName(dir, name));
     packagesDir.listSync(fullPaths: false);
     return result;
@@ -42,7 +43,7 @@ class FilesystemRepository implements Repository {
   List<PackageId> findByOrganizationAndName(String organization, String name) {
     List<PackageId> result = <PackageId>[];
 
-    Directory packageDir = root.subdirectory([organization, name]);
+    Directory packageDir = packagesDir.subdirectory([organization, name]);
     if (!packageDir.existsSync()) {
       return result;
     }
@@ -63,21 +64,21 @@ class FilesystemRepository implements Repository {
   }
 
   Package readPackage(PackageId id) {
-    Directory packageDir = root.subdirectory([id.organization, id.name, "${id.version}"]);
+    Directory packageDir = packagesDir.subdirectory([id.organization, id.name, "${id.version}"]);
     if (!packageDir.existsSync()) {
-      throw new RepositoryException("Package '$id' doesn't exist in '${root.path}'");
+      throw new RepositoryException("Package '$id' doesn't exist in '${packagesDir.path}'");
     }
 
     File packageDescriptorFile = packageDir.file("info.dpm");
     if (!packageDescriptorFile.existsSync()) {
-      throw new RepositoryException("Package '$id' in '${root.path}' doesn't contain a descriptor (info.dpm)");
+      throw new RepositoryException("Package '$id' in '${packagesDir.path}' doesn't contain a descriptor (info.dpm)");
     }
 
     return new Package.fromDescriptorFile(packageDescriptorFile);
   }
 
   String toUrl(Package package, [String script]) {
-    Directory packageDir = root.subdirectory([package.organization, package.name, "${package.version}"]);
+    Directory packageDir = packagesDir.subdirectory([package.organization, package.name, "${package.version}"]);
     if (script != null) {
       return packageDir.file(script).name;
     } else if (package.mainScript != null) {
@@ -88,7 +89,7 @@ class FilesystemRepository implements Repository {
   }
 }
 
-class _LocalUserRepository extends FilesystemRepository {
-  _LocalUserRepository() : super(new Directory.home().subdirectory([".dpm"]));
+class LocalUserRepository extends FilesystemRepository {
+  LocalUserRepository() : super(new Directory.home().subdirectory([".dpm"]));
 }
 

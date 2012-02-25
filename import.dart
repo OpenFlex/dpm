@@ -14,6 +14,7 @@ class ImportSpecification {
   factory ImportSpecification.parse(String import) {
     String coordinatesStr = import;
     String script;
+
     final scriptIdx = import.indexOf('/', 0);
     if (scriptIdx != -1) {
       coordinatesStr = import.substring(0, scriptIdx);
