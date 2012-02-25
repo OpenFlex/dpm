@@ -6,8 +6,9 @@
 var testrepo = 'not yet determined';
 
 determineTestRepoPath() {
-  var scriptPath = new Options().script;
-  testrepo = scriptPath.replaceFirst("test.dart", "testrepo");
+  var script = new Options().script;
+  var testrepoDir = new File(script).directorySync().subdirectory(["testrepo"]);
+  testrepo = testrepoDir.path;
 }
 
 Repository buildTestRepo() {

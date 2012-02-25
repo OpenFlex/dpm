@@ -32,7 +32,7 @@ scan(String filePath, InferringState state) {
   }
 
   File file = new File(filePath);
-  String content = readFile(file);
+  String content = file.readAsTextSync();
   for (Match match in libraryRegexp.allMatches(content)) {
     FoundLibrary library = new FoundLibrary(relativePath, match[1]);
     state.libraries.add(library);

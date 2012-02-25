@@ -213,10 +213,7 @@ class Package implements Hashable {
   }
 
   factory Package.fromDescriptorFile(File descriptorFile) {
-    FileInputStream input = descriptorFile.openInputStream();
-    StringInputStream strInput = new StringInputStream(input, "UTF-8");
-    String descriptor = strInput.readSync();
-    input.close();
+    String descriptor = descriptorFile.readAsTextSync();
     return new Package.fromDescriptor(descriptor);
   }
 
