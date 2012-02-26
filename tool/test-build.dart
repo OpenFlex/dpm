@@ -9,17 +9,17 @@ main() {
   var testFilesPath = testFiles.path;
   expectThat(testFiles, directoryExists());
 
-  expectThat( () => build([]), throwsException());
+  expectThat( () => build([], testFiles), throwsException());
 
-  expectThat( () => build(["$testFilesPath/my-lib", "ignored"]), throwsException());
-  expectThat( () => build(["$testFilesPath/my-lib", "-ignored", "ignored"]), throwsException());
-  expectThat( () => build(["$testFilesPath/my-lib", "+ignored", "ignored"]), throwsException());
+  expectThat( () => build(["$testFilesPath/my-lib", "ignored"], testFiles), throwsException());
+  expectThat( () => build(["$testFilesPath/my-lib", "-ignored", "ignored"], testFiles), throwsException());
+  expectThat( () => build(["$testFilesPath/my-lib", "+ignored", "ignored"], testFiles), throwsException());
 
-  expectThat( () => build(["$testFilesPath/nonexisting-directory"]), throwsException());
-  expectThat( () => build(["$testFilesPath/no-descriptor"]), throwsException());
+  expectThat( () => build(["$testFilesPath/nonexisting-directory"], testFiles), throwsException());
+  expectThat( () => build(["$testFilesPath/no-descriptor"], testFiles), throwsException());
 
-  expectThat( () => build(["$testFilesPath/my-lib"]), returnsNormally());
-  var package = new File("my-organization-my-lib-0.1.arraz");
+  expectThat( () => build(["$testFilesPath/my-lib"], testFiles), returnsNormally());
+  var package = testFiles.file("my-organization-my-lib-0.1.arraz");
   expectThat(package, fileExists());
   var archive = new ExtractArchive(package);
   expectThat(archive.listEntries(), unorderedEquals([
@@ -30,8 +30,8 @@ main() {
   package.deleteSync();
   expectThat(package, not(fileExists()));
 
-  expectThat( () => build(["$testFilesPath/my-lib-with-subdir"]), returnsNormally());
-  package = new File("my-organization-my-lib-0.1.arraz");
+  expectThat( () => build(["$testFilesPath/my-lib-with-subdir"], testFiles), returnsNormally());
+  package = testFiles.file("my-organization-my-lib-0.1.arraz");
   expectThat(package, fileExists());
   archive = new ExtractArchive(package);
   expectThat(archive.listEntries(), unorderedEquals([
@@ -43,8 +43,8 @@ main() {
   package.deleteSync();
   expectThat(package, not(fileExists()));
 
-  expectThat( () => build(["$testFilesPath/my-lib", "+info.dpm", "+lib.dart"]), returnsNormally());
-  package = new File("my-organization-my-lib-0.1.arraz");
+  expectThat( () => build(["$testFilesPath/my-lib", "+info.dpm", "+lib.dart"], testFiles), returnsNormally());
+  package = testFiles.file("my-organization-my-lib-0.1.arraz");
   expectThat(package, fileExists());
   archive = new ExtractArchive(package);
   expectThat(archive.listEntries(), unorderedEquals([
@@ -54,8 +54,8 @@ main() {
   package.deleteSync();
   expectThat(package, not(fileExists()));
 
-  expectThat( () => build(["$testFilesPath/my-lib-with-ignored-subdir", "-ignored"]), returnsNormally());
-  package = new File("my-organization-my-lib-0.1.arraz");
+  expectThat( () => build(["$testFilesPath/my-lib-with-ignored-subdir", "-ignored"], testFiles), returnsNormally());
+  package = testFiles.file("my-organization-my-lib-0.1.arraz");
   expectThat(package, fileExists());
   archive = new ExtractArchive(package);
   expectThat(archive.listEntries(), unorderedEquals([

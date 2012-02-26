@@ -1,6 +1,7 @@
 // Copyright (c) 2012, Ladislav Thon. All rights reserved. Use of this source
 // code is governed by a BSD-style license that can be found in the LICENSE file.
 
+#import('dart:io');
 #import('../dpm.dart');
 #import('dpm-tool.dart');
 

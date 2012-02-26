@@ -54,9 +54,13 @@ class FilteringCreateArchive implements CreateArchive {
   bool build(File archive) => delegate.build(archive);
 }
 
-build(List<String> args) {
+build(List<String> args, [Directory workingDir]) {
+  if (workingDir == null) {
+    workingDir = new Directory(new File(".").fullPathSync());
+  }
+
   if (args.length == 0) {
-    throw new ToolException("The 'build' commands needs an argument");
+    throw new ToolException("The 'build' command needs an argument");
   }
 
   var archive = new CreateArchive();
@@ -86,7 +90,7 @@ build(List<String> args) {
   };
   dir.listSync(recursive: true);
 
-  var archiveFile = new File("${pkg.organization}-${pkg.name}-${pkg.version}.arraz");
+  var archiveFile = workingDir.file("${pkg.organization}-${pkg.name}-${pkg.version}.arraz");
   archive.build(archiveFile);
 }
 
