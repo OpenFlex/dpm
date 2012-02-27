@@ -64,7 +64,7 @@ main() {
 
     "infer": infer,
     "build": build,
-    "deploy": nyi,
+    "deploy": deploy,
     "publish": nyi
   };
 

@@ -8,6 +8,7 @@
 
 #source('infer.dart');
 #source('build.dart');
+#source('deploy.dart');
 
 final dpmToolVersion = "0.1-dev";
 
