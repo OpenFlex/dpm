@@ -81,8 +81,9 @@ build(List<String> args, [Directory workingDir]) {
 
   Package pkg = new Package.fromDescriptorFile(infoDpm);
 
+  var dirPath = new File(dir.path).fullPathSync();
   dir.fileHandler = (path) {
-    var relativePath = path.replaceFirst(dir.path, "");
+    var relativePath = path.replaceFirst(dirPath, "");
     if (relativePath.startsWith("/")) {
       relativePath = relativePath.substring(1);
     }
