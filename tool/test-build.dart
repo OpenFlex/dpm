@@ -17,6 +17,7 @@ main() {
 
   expectThat( () => build(["$testFilesPath/nonexisting-directory"], testFiles), throwsException());
   expectThat( () => build(["$testFilesPath/no-descriptor"], testFiles), throwsException());
+  expectThat( () => build(["$testFilesPath/invalid-descriptor"], testFiles), throwsException());
 
   expectThat( () => build(["$testFilesPath/my-lib"], testFiles), returnsNormally());
   var package = testFiles.file("my-organization-my-lib-0.1.arraz");
