@@ -27,12 +27,15 @@ deploy(List<String> args, [FilesystemRepository repo]) {
     var pkgArchive = new ExtractArchive(new File(pkgPath));
 
     Directory temp = new Directory(repo.root.path).subdirectory(["temp"]);
-    temp.createTempSync();
-    pkgArchive.extractEntry("info.dpm", temp);
+    try {
+      temp.createTempSync();
+      pkgArchive.extractEntry("info.dpm", temp);
 
-    Package pkg = new Package.fromDescriptorFile(temp.file("info.dpm"));
-    pkgArchive.extractTo(repo.packagesDir.subdirectory([pkg.organization, pkg.name, "${pkg.version}"]));
-    temp.deleteRecursivelySync();
+      Package pkg = new Package.fromDescriptorFile(temp.file("info.dpm"));
+      pkgArchive.extractTo(repo.packagesDir.subdirectory([pkg.organization, pkg.name, "${pkg.version}"]));
+    } finally {
+      temp.deleteRecursivelySync();
+    }
   }
 }
 
