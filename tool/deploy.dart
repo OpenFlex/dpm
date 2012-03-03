@@ -32,7 +32,7 @@ deploy(List<String> args, [FilesystemRepository repo]) {
 
     Package pkg = new Package.fromDescriptorFile(temp.file("info.dpm"));
     pkgArchive.extractTo(repo.packagesDir.subdirectory([pkg.organization, pkg.name, "${pkg.version}"]));
-    temp.deleteSync(recursive: true);
+    temp.deleteRecursivelySync();
   }
 }
 

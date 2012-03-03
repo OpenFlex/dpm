@@ -38,7 +38,7 @@ main() {
   expectThat(package, not(fileExists()));
 
   var pkgsDir = testFiles.subdirectory(["repo", "packages"]);
-  pkgsDir.delete(recursive: true);
+  pkgsDir.deleteRecursivelySync();
   expectThat(pkgsDir, not(directoryExists()));
 
   print("ok");

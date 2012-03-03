@@ -79,10 +79,10 @@ build(List<String> args, [Directory workingDir]) {
     throw new ToolException("The 'info.dpm' descriptor doesn't exists in '$path'");
   }
 
-  Package pkg = new Package.fromDescriptorFile(infoDpm);
+  Package pkg = new Package.fromDescriptorFile(infoDpm); // also validates syntax
 
   var dirPath = new File(dir.path).fullPathSync();
-  dir.fileHandler = (path) {
+  dir.onFile = (path) {
     var relativePath = path.replaceFirst(dirPath, "");
     if (relativePath.startsWith("/")) {
       relativePath = relativePath.substring(1);

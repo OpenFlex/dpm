@@ -35,7 +35,7 @@ class FilesystemRepository implements Repository {
     List<PackageId> result = <PackageId>[];
 
     Directory packagesDir = new Directory(packagesDir.path);
-    packagesDir.dirHandler = (dir) => result.addAll(findByOrganizationAndName(dir, name));
+    packagesDir.onDir = (dir) => result.addAll(findByOrganizationAndName(dir, name));
     packagesDir.listSync(fullPaths: false);
     return result;
   }
@@ -48,7 +48,7 @@ class FilesystemRepository implements Repository {
       return result;
     }
 
-    packageDir.dirHandler = (dir) => result.add(new PackageId(organization, name, new Version(dir)));
+    packageDir.onDir = (dir) => result.add(new PackageId(organization, name, new Version(dir)));
     packageDir.listSync(fullPaths: false);
     return result;
   }

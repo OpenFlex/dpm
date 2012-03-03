@@ -69,7 +69,7 @@ infer(List<String> args) {
   }
 
   var state = new InferringState(path);
-  dir.fileHandler = (file) => scan(file, state);
+  dir.onFile = (file) => scan(file, state);
   dir.listSync(recursive: true, fullPaths: true);
 
   if (state.libraries.length == 0) {
