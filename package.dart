@@ -217,6 +217,10 @@ class Package implements Hashable {
     return new Package.fromDescriptor(descriptor);
   }
 
+  bool operator ==(other) => other is Package
+      && id == other.id
+      && mainScript == other.mainScript;
+
   int hashCode() {
     int result = 17;
     result = 31 * result + id.hashCode();
