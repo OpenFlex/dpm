@@ -16,6 +16,7 @@ main() {
 
   var repo = new FilesystemRepository(testFiles.subdirectory(["repo"]));
 
+  expectThat( () => deploy(null, repo), throwsException());
   expectThat( () => deploy([], repo), throwsException());
 
   expectThat( () => deploy(["$testFilesPath/nonexisting-archive.arraz"], repo), throwsException());

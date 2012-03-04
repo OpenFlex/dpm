@@ -9,6 +9,7 @@ main() {
   var testFilesPath = testFiles.path;
   expectThat(testFiles, directoryExists());
 
+  expectThat( () => build(null, testFiles), throwsException());
   expectThat( () => build([], testFiles), throwsException());
 
   expectThat( () => build(["$testFilesPath/my-lib", "ignored"], testFiles), throwsException());

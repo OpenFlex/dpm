@@ -26,6 +26,7 @@ main() {
   var testFilesPath = testFiles.path;
   expectThat(testFiles, directoryExists());
 
+  expectThat( () => infer(null), throwsException());
   expectThat( () => infer([]), throwsException());
   expectThat( () => infer(["one", "two"]), throwsException());
 

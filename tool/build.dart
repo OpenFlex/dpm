@@ -55,12 +55,12 @@ class FilteringCreateArchive implements CreateArchive {
 }
 
 build(List<String> args, [Directory workingDir]) {
-  if (workingDir == null) {
-    workingDir = new Directory(new File(".").fullPathSync());
+  if (args == null || args.length == 0) {
+    throw new ToolException("The 'build' command needs an argument");
   }
 
-  if (args.length == 0) {
-    throw new ToolException("The 'build' command needs an argument");
+  if (workingDir == null) {
+    workingDir = new Directory(new File(".").fullPathSync());
   }
 
   var archive = new CreateArchive();

@@ -2,12 +2,12 @@
 // code is governed by a BSD-style license that can be found in the LICENSE file.
 
 deploy(List<String> args, [FilesystemRepository repo]) {
-  if (repo == null) {
-    repo = new LocalUserRepository();
+  if (args == null || args.length == 0) {
+    throw new ToolException("The 'deploy' command needs at least one argument");
   }
 
-  if (args.length == 0) {
-    throw new ToolException("The 'deploy' command needs at least one argument");
+  if (repo == null) {
+    repo = new LocalUserRepository();
   }
 
   Directory temp = new Directory(repo.root.path).subdirectory(["temp"]);

@@ -47,7 +47,7 @@ scan(String filePath, InferringState state) {
 }
 
 infer(List<String> args) {
-  if (args.length == 0) {
+  if (args == null || args.length == 0) {
     throw new ToolException("The 'infer' commands needs an argument");
   }
 
