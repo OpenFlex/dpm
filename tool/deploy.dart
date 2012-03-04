@@ -10,32 +10,48 @@ deploy(List<String> args, [FilesystemRepository repo]) {
     throw new ToolException("The 'deploy' command needs at least one argument");
   }
 
-  // check first -- all packages must exist and have the descriptor
-  for (String pkgPath in args) {
-    var pkg = new File(pkgPath);
-    if (!pkg.existsSync()) {
-      throw new ToolException("The package '$pkgPath' doesn't exist");
-    }
+  Directory temp = new Directory(repo.root.path).subdirectory(["temp"]);
+  try {
+    temp.createTempSync();
 
-    var pkgArchive = new ExtractArchive(pkg);
-    if (!pkgArchive.findEntry("info.dpm")) {
-      throw new ToolException("The package '$pkgPath' doesn't containt the 'info.dpm' descriptor");
-    }
-  }
+    // check first -- all packages must exist and have a valid descriptor
+    for (String pkgPath in args) {
+      var pkg = new File(pkgPath);
+      if (!pkg.existsSync()) {
+        throw new ToolException("The package '$pkgPath' doesn't exist");
+      }
 
-  for (String pkgPath in args) {
-    var pkgArchive = new ExtractArchive(new File(pkgPath));
+      var pkgArchive = new ExtractArchive(pkg);
+      if (!pkgArchive.findEntry("info.dpm")) {
+        throw new ToolException("The package '$pkgPath' doesn't containt the 'info.dpm' descriptor");
+      }
 
-    Directory temp = new Directory(repo.root.path).subdirectory(["temp"]);
-    try {
-      temp.createTempSync();
       pkgArchive.extractEntry("info.dpm", temp);
+      var descriptorFile = temp.file("info.dpm");
 
-      Package pkg = new Package.fromDescriptorFile(temp.file("info.dpm"));
-      pkgArchive.extractTo(repo.packagesDir.subdirectory([pkg.organization, pkg.name, "${pkg.version}"]));
-    } finally {
-      temp.deleteRecursivelySync();
+      try {
+        new Package.fromDescriptorFile(descriptorFile);
+      } catch (PackageException e) {
+        throw new ToolException("Package '$pkgPath' has bad descriptor (${e.message})");
+      } finally {
+        descriptorFile.deleteSync();
+      }
     }
+
+    for (String pkgPath in args) {
+      var pkgArchive = new ExtractArchive(new File(pkgPath));
+
+      try {
+        pkgArchive.extractEntry("info.dpm", temp);
+
+        Package pkg = new Package.fromDescriptorFile(temp.file("info.dpm"));
+        pkgArchive.extractTo(repo.packagesDir.subdirectory([pkg.organization, pkg.name, "${pkg.version}"]));
+      } finally {
+        temp.deleteRecursivelySync();
+      }
+    }
+  } finally {
+    temp.deleteRecursivelySync();
   }
 }
 
