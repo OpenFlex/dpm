@@ -4,37 +4,7 @@
 #import('dart:io');
 #import('../dpm.dart');
 #import('dpm-tool.dart');
-
-intro() {
-  print("""
-DPM, the Dart Package Manager
-Usage: dpm <command> [<argument> ...]
-
-Commands for working with a repository:
-   install <pkg> [...]            install packages from remote repo
-   remove <pkg> [...]             remove installed packages
-   search <what>                  find packages in remote repo
-   show <pkg>                     shows detailed info about a package
-   list [<what>]                  list installed packages
-
-Commands for creating packages:
-   infer <directory>              automatically generate info.dpm if possible
-   build <directory>              build an .arraz package of a directory
-   deploy <pkg file> [...]        install an .arraz package(s) to local repo
-   publish <pkg file> [...]       publish an .arraz package(s) to remote repo
-
-General commands:
-   help                           show general help for DPM
-   help <command>                 show help for specified command
-   version                        show some informations about DPM
-""");
-}
-
-generalHelp() {
-}
-
-helpForCommand(cmd) {
-}
+#source('help.dart');
 
 help(args) => args.length == 0 ? generalHelp() : helpForCommand(args[0]);
 
