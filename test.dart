@@ -7,7 +7,7 @@ var testrepo = 'not yet determined';
 
 determineTestRepoPath() {
   var script = new Options().script;
-  var testrepoDir = new File(script).directorySync().subdirectory(["testrepo"]);
+  var testrepoDir = new File(script).directorySync().subdirectory(["testfiles", "repo"]);
   testrepo = testrepoDir.path;
 }
 
