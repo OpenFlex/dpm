@@ -334,66 +334,130 @@ testImportResolving() {
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.1");
   Import resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-matchers"));
+  expectThat(resolved.package.version, equals(new Version("0.1")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.1/matchers.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.*");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-matchers"));
+  expectThat(resolved.package.version, equals(new Version("0.2")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.2/matchers.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.*/dart-matchers.dart");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-matchers"));
+  expectThat(resolved.package.version, equals(new Version("0.2")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.2/dart-matchers.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.1/src/dart-matchers.dart");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-matchers"));
+  expectThat(resolved.package.version, equals(new Version("0.1")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.1/src/dart-matchers.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-matchers"));
+  expectThat(resolved.package.version, equals(new Version("0.2")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.2/matchers.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers/matchers.dart");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-matchers"));
+  expectThat(resolved.package.version, equals(new Version("0.2")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-matchers/0.2/matchers.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-query:0.1");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("0.1")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/0.1/query.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-query:0.*");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("0.2")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/0.2/query.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-query:*");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("1.0")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/query.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-query");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("1.0")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/query.dart"));
 
   spec = new ImportSpecification.parse("dart-query");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("1.0")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/query.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-query:0.1/dart-query.dart");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("0.1")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/0.1/dart-query.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-query:0.*/dart-query.dart");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("0.2")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/0.2/dart-query.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-query:*/dart-query.dart");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("1.0")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/dart-query.dart"));
 
   spec = new ImportSpecification.parse("com.ladicek:dart-query/dart-query.dart");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("1.0")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/dart-query.dart"));
 
   spec = new ImportSpecification.parse("dart-query/dart-query.dart");
   resolved = new Import.resolve(spec, repo);
+  expectThat(resolved.package, isNotNull());
+  expectThat(resolved.package.organization, equals("com.ladicek"));
+  expectThat(resolved.package.name, equals("dart-query"));
+  expectThat(resolved.package.version, equals(new Version("1.0")));
   expectThat(resolved.url, equals("$testrepo/packages/com.ladicek/dart-query/1.0/dart-query.dart"));
 }
 

@@ -34,9 +34,10 @@ class ImportSpecification {
 }
 
 class Import implements Hashable {
+  final Package package;
   final String url;
 
-  Import._new(String this.url);
+  Import._new(Package this.package, String this.url);
 
   factory Import.resolve(ImportSpecification spec, Repository repo) {
     List<PackageId> candidates = repo.find(spec.coordinates);
@@ -70,7 +71,7 @@ class Import implements Hashable {
     Package package = repo.readPackage(selected);
 
     String url = repo.toUrl(package, spec.script);
-    return new Import._new(url);
+    return new Import._new(package, url);
   }
 
   bool operator ==(other) => other is Import && url == other.url;
