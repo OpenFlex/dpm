@@ -39,7 +39,29 @@ class Import implements Hashable {
 
   Import._new(Package this.package, String this.url);
 
-  factory Import.resolve(ImportSpecification spec, Repository repo) {
+  bool operator ==(other) => other is Import && url == other.url;
+
+  int hashCode() => url.hashCode();
+
+  String toString() => 'imported $package';
+}
+
+interface ImportResolver {
+  ImportResolver(Repository repo);
+
+  Import resolve(ImportSpecification spec);
+}
+
+/// The basic import resolving algorithm. Always resolves to the highest
+/// version of all candidates satisfying the specification. Throws an exception
+/// when no candidate is found or when organization is not specified and there
+/// are packages with the same name from different organizations.
+class BasicImportResolver implements ImportResolver {
+  final Repository repo;
+
+  BasicImportResolver(Repository this.repo);
+
+  Import resolve(ImportSpecification spec) {
     List<PackageId> candidates = repo.find(spec.coordinates);
 
     if (candidates.length == 0) {
@@ -65,9 +87,30 @@ class Import implements Hashable {
     String url = repo.toUrl(package, spec.script);
     return new Import._new(package, url);
   }
+}
 
-  bool operator ==(other) => other is Import && url == other.url;
+/// Builds on top of the [BasicImportResolver] and prevents resolving more
+/// than one version of a single package. If one version of a package
+/// (organization:name:version) was already resolved and another version
+/// of the same package (organization:name:differentVersion) is to be resolved
+/// now, throws an exception.
+class RuntimeAwareImportResolver implements ImportResolver {
+  final BasicImportResolver basicResolver;
+  final Map<String, Version> alreadyResolved;
 
-  int hashCode() => url.hashCode();
+  RuntimeAwareImportResolver(Repository repo)
+    : basicResolver = new BasicImportResolver(repo), alreadyResolved = <Version>{};
+
+  Import resolve(ImportSpecification spec) {
+    Import import = basicResolver.resolve(spec);
+
+    String key = "${import.package.organization}:${import.package.name}";
+    if (alreadyResolved.containsKey(key) && import.package.version != alreadyResolved[key]) {
+      throw new ResolvingException("Tried to import package '${import.package}', but '$key' was already imported (version '${alreadyResolved[key]}')");
+    }
+
+    alreadyResolved[key] = import.package.version;
+    return import;
+  }
 }
 

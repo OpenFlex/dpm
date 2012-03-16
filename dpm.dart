@@ -9,6 +9,7 @@
 #source('package.dart');
 #source('repository.dart');
 #source('import.dart');
+#source('runtime.dart');
 
 final dpmVersion = "0.1-dev";
 
@@ -18,13 +19,5 @@ class DpmException implements Exception {
   DpmException(String this._message);
 
   String toString() => _message;
-}
-
-String resolveLocally(String importSpecStr) {
-  ImportSpecification spec = new ImportSpecification.parse(importSpecStr);
-  Repository repo = new LocalUserRepository();
-
-  Import import = new Import.resolve(spec, repo);
-  return import.url;
 }
 
