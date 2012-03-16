@@ -57,14 +57,6 @@ class Import implements Hashable {
       }
     }
 
-    if (spec.version != null) {
-      candidates = candidates.filter( (c) => spec.version.isSatisfiedBy(c.version) );
-    }
-
-    if (candidates.length == 0) {
-      throw new ResolvingException("Couldn't resolve '$spec'");
-    }
-
     candidates.sort( (a, b) => -a.version.compareTo(b.version) ); // highest first
 
     PackageId selected = candidates[0];
