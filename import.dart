@@ -47,8 +47,6 @@ class Import implements Hashable {
 }
 
 interface ImportResolver {
-  ImportResolver(Repository repo);
-
   Import resolve(ImportSpecification spec);
 }
 
