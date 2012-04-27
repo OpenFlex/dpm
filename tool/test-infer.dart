@@ -26,14 +26,14 @@ main() {
   var testFilesPath = testFiles.path;
   expectThat(testFiles, directoryExists());
 
-  expectThat( () => infer(null), throwsException());
-  expectThat( () => infer([]), throwsException());
-  expectThat( () => infer(["one", "two"]), throwsException());
+  expectThat( () => infer(null), throws());
+  expectThat( () => infer([]), throws());
+  expectThat( () => infer(["one", "two"]), throws());
 
-  expectThat( () => infer(["$testFilesPath/nonexisting-directory"]), throwsException());
-  expectThat( () => infer(["$testFilesPath/no-dart-file"]), throwsException());
-  expectThat( () => infer(["$testFilesPath/no-lib"]), throwsException());
-  expectThat( () => infer(["$testFilesPath/more-libs"]), throwsException());
+  expectThat( () => infer(["$testFilesPath/nonexisting-directory"]), throws());
+  expectThat( () => infer(["$testFilesPath/no-dart-file"]), throws());
+  expectThat( () => infer(["$testFilesPath/no-lib"]), throws());
+  expectThat( () => infer(["$testFilesPath/more-libs"]), throws());
 
   expectThat( () => infer(["$testFilesPath/one-lib-no-imports"]), returnsNormally());
   var infoDpm = new File("$testFilesPath/one-lib-no-imports/info.dpm");

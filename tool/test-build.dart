@@ -9,16 +9,16 @@ main() {
   var testFilesPath = testFiles.path;
   expectThat(testFiles, directoryExists());
 
-  expectThat( () => build(null, testFiles), throwsException());
-  expectThat( () => build([], testFiles), throwsException());
+  expectThat( () => build(null, testFiles), throws());
+  expectThat( () => build([], testFiles), throws());
 
-  expectThat( () => build(["$testFilesPath/my-lib", "ignored"], testFiles), throwsException());
-  expectThat( () => build(["$testFilesPath/my-lib", "-ignored", "ignored"], testFiles), throwsException());
-  expectThat( () => build(["$testFilesPath/my-lib", "+ignored", "ignored"], testFiles), throwsException());
+  expectThat( () => build(["$testFilesPath/my-lib", "ignored"], testFiles), throws());
+  expectThat( () => build(["$testFilesPath/my-lib", "-ignored", "ignored"], testFiles), throws());
+  expectThat( () => build(["$testFilesPath/my-lib", "+ignored", "ignored"], testFiles), throws());
 
-  expectThat( () => build(["$testFilesPath/nonexisting-directory"], testFiles), throwsException());
-  expectThat( () => build(["$testFilesPath/no-descriptor"], testFiles), throwsException());
-  expectThat( () => build(["$testFilesPath/invalid-descriptor"], testFiles), throwsException());
+  expectThat( () => build(["$testFilesPath/nonexisting-directory"], testFiles), throws());
+  expectThat( () => build(["$testFilesPath/no-descriptor"], testFiles), throws());
+  expectThat( () => build(["$testFilesPath/invalid-descriptor"], testFiles), throws());
 
   expectThat( () => build(["$testFilesPath/my-lib"], testFiles), returnsNormally());
   var package = testFiles.file("my-organization-my-lib-0.1.arraz");

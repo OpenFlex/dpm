@@ -16,13 +16,13 @@ main() {
 
   var repo = new FilesystemRepository(testFiles.subdirectory(["repo"]));
 
-  expectThat( () => deploy(null, repo), throwsException());
-  expectThat( () => deploy([], repo), throwsException());
+  expectThat( () => deploy(null, repo), throws());
+  expectThat( () => deploy([], repo), throws());
 
-  expectThat( () => deploy(["$testFilesPath/nonexisting-archive.arraz"], repo), throwsException());
-  expectThat( () => deploy(["$testFilesPath/empty-archive.arraz"], repo), throwsException());
-  expectThat( () => deploy(["$testFilesPath/package-without-descriptor.arraz"], repo), throwsException());
-  expectThat( () => deploy(["$testFilesPath/package-with-invalid-descriptor.arraz"], repo), throwsException());
+  expectThat( () => deploy(["$testFilesPath/nonexisting-archive.arraz"], repo), throws());
+  expectThat( () => deploy(["$testFilesPath/empty-archive.arraz"], repo), throws());
+  expectThat( () => deploy(["$testFilesPath/package-without-descriptor.arraz"], repo), throws());
+  expectThat( () => deploy(["$testFilesPath/package-with-invalid-descriptor.arraz"], repo), throws());
 
   expectThat( () => build(["$buildTestFilesPath/my-lib"], testFiles), returnsNormally());
   var package = testFiles.file("my-organization-my-lib-0.1.arraz");

@@ -53,22 +53,22 @@ testVersions() {
   expectThat(s.isSatisfiedBy(v), isFalse());
   expectThat("$s", equals("2.*"));
 
-  expectThat( () => new Version(null), throwsException());
-  expectThat( () => new Version("a"), throwsException());
-  expectThat( () => new Version("1.*"), throwsException());
-  expectThat( () => new VersionSpecification(null), throwsException());
-  expectThat( () => new VersionSpecification("a"), throwsException());
-  expectThat( () => new VersionSpecification("1*"), throwsException());
+  expectThat( () => new Version(null), throws());
+  expectThat( () => new Version("a"), throws());
+  expectThat( () => new Version("1.*"), throws());
+  expectThat( () => new VersionSpecification(null), throws());
+  expectThat( () => new VersionSpecification("a"), throws());
+  expectThat( () => new VersionSpecification("1*"), throws());
 }
 
 testPackages() {
   expectThat( () => new PackageId("org", "name", new Version("0.1")), returnsNormally());
-  expectThat( () => new PackageId("-org", "name", new Version("0.1")), throwsException());
-  expectThat( () => new PackageId("org", "-name", new Version("0.1")), throwsException());
-  expectThat( () => new PackageId("org", "name", new Version("-0.1")), throwsException());
-  expectThat( () => new PackageId("org", "name", null), throwsException());
-  expectThat( () => new PackageId("org", null, new Version("0.1")), throwsException());
-  expectThat( () => new PackageId(null, "name", new Version("0.1")), throwsException());
+  expectThat( () => new PackageId("-org", "name", new Version("0.1")), throws());
+  expectThat( () => new PackageId("org", "-name", new Version("0.1")), throws());
+  expectThat( () => new PackageId("org", "name", new Version("-0.1")), throws());
+  expectThat( () => new PackageId("org", "name", null), throws());
+  expectThat( () => new PackageId("org", null, new Version("0.1")), throws());
+  expectThat( () => new PackageId(null, "name", new Version("0.1")), throws());
 
   expectThat( () => new PackageId("_org", "0name", new Version("0.1")), returnsNormally());
   expectThat( () => new PackageId("_o1r-g.", "0n_a-m.e1", new Version("0.1")), returnsNormally());
@@ -171,10 +171,10 @@ Binaries: program, runner
   expectThat(p.name, equals("0.1"));
   expectThat(p.version, isNull());
 
-  expectThat( () => new PackageCoordinates.parse(null), throwsException());
-  expectThat( () => new PackageCoordinates.parse(""), throwsException());
-  expectThat( () => new PackageCoordinates.parse("-"), throwsException());
-  expectThat( () => new PackageCoordinates.parse("--"), throwsException());
+  expectThat( () => new PackageCoordinates.parse(null), throws());
+  expectThat( () => new PackageCoordinates.parse(""), throws());
+  expectThat( () => new PackageCoordinates.parse("-"), throws());
+  expectThat( () => new PackageCoordinates.parse("--"), throws());
 }
 
 testFilesystemRepository() {
@@ -249,7 +249,7 @@ testFilesystemRepository() {
   expectThat(pkg.dependencies, emptyCollection());
   expectThat(pkg.binaries, orderedEquals(["test-matchers", "run-matcher"]));
 
-  expectThat( () => repo.toUrl(pkg), throwsException());
+  expectThat( () => repo.toUrl(pkg), throws());
 
   url = repo.toUrl(pkg, "main.dart");
   expectThat(url, equals("$testrepo/packages/com.example/dart-matchers/0.0.1/main.dart"));
@@ -322,16 +322,16 @@ testBasicImportResolving() {
   ImportResolver resolver = new BasicImportResolver(repo);
 
   ImportSpecification spec = new ImportSpecification.parse("doesnt:exist:0");
-  expectThat( () => resolver.resolve(spec), throwsException());
+  expectThat( () => resolver.resolve(spec), throws());
 
   spec = new ImportSpecification.parse("doesnt-exist:0");
-  expectThat( () => resolver.resolve(spec), throwsException());
+  expectThat( () => resolver.resolve(spec), throws());
 
   spec = new ImportSpecification.parse("doesnt-exist");
-  expectThat( () => resolver.resolve(spec), throwsException());
+  expectThat( () => resolver.resolve(spec), throws());
 
   spec = new ImportSpecification.parse("dart-matchers");
-  expectThat( () => resolver.resolve(spec), throwsException());
+  expectThat( () => resolver.resolve(spec), throws());
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.1");
   Import resolved = resolver.resolve(spec);
@@ -474,7 +474,7 @@ testRuntimeAwareImportResolving() {
   expectThat(() => resolver.resolve(spec), returnsNormally());
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.1");
-  expectThat(() => resolver.resolve(spec), throwsException());
+  expectThat(() => resolver.resolve(spec), throws());
 
   spec = new ImportSpecification.parse("com.ladicek:dart-matchers:0.2");
   expectThat(() => resolver.resolve(spec), returnsNormally());
